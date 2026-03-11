@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome | NRSC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="auth-body">
+
+<div class="card home-card">
+
+    <img src="{{ url_for('static', filename='image/nrsc_logo.png') }}"
+         class="logo-bordered"
+         alt="NRSC Logo">
+
+    <div class="home-content">
+        <h1>Welcome to<br>NRSC</h1>
+        <p class="subtitle">Please select your role to continue</p>
+
+        <div class="home-buttons">
+            <a href="/staff" class="btn-orange full-width">Staff</a>
+            <a href="/visitor/options" class="btn-orange full-width">Visitor</a>
+            <a href="/admin_login" class="btn-orange full-width">Admin</a>
+            <a href="/csif_verification" class="btn-orange full-width">CISF</a>
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
+

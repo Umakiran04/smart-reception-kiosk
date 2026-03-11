@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Visitors Assigned to Each Staff</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="auth-body">
+
+<div class="dashboard-container">
+    <h2>Visitors Assigned to Each Staff</h2>
+
+    <table class="fixed-table">
+        <tr>
+            <th>Staff Name</th>
+            <th>Number of Visitors</th>
+        </tr>
+
+        {% for row in data %}
+        <tr>
+            <td>{{ row.person }}</td>
+            <td>{{ row.visitor_count }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="/admin_dashboard" class="btn-blue">⬅ Back</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CSIF Verification | Smart Reception Kiosk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .csif-form {
+            max-width: 400px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 32px 28px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.13);
+        }
+        .csif-form h2 {
+            color: #0b4db8;
+            margin-bottom: 18px;
+        }
+        .csif-form label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            color: #0b4db8;
+        }
+        .csif-form input[type="text"],
+        .csif-form input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            border: 1px solid #bbb;
+            font-size: 15px;
+        }
+        .csif-form button {
+            width: 100%;
+            padding: 12px;
+            background: #ff9800;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .csif-form button:hover {
+            background: #f57c00;
+        }
+        .csif-message {
+            margin-top: 18px;
+            font-size: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .csif-message.success { color: green; }
+        .csif-message.error { color: red; }
+    </style>
+</head>
+<body class="auth-body">
+    <form class="csif-form" method="POST" action="/csif_verification" id="csifForm">
+        <h2>CSIF Verification</h2>
+        <label for="aadhaar">Aadhaar Card Number</label>
+        <input type="text" id="aadhaar" name="aadhaar" maxlength="12" pattern="\d{12}" placeholder="Enter 12-digit Aadhaar" value="{{ aadhaar|default('') }}" required>
+        <label for="dob">Date of Birth</label>
+        <input type="date" id="dob" name="dob" value="{{ dob|default('') }}" required>
+        <button type="submit" id="verifyBtn">Verify</button>
+        {% if message %}
+            <div class="csif-message {{ status }}" id="csifMsg">{{ message }}</div>
+        {% endif %}
+    </form>
+    <script>
+    // Client-side validation
+    document.getElementById('csifForm').addEventListener('submit', function(e) {
+        var aadhaar = document.getElementById('aadhaar').value.trim();
+        var dob = document.getElementById('dob').value.trim();
+        if (!aadhaar || !dob) {
+            alert('All fields are required.');
+            e.preventDefault();
+            return false;
+        }
+        if (!/^\d{12}$/.test(aadhaar)) {
+            alert('Aadhaar must be a 12-digit number.');
+            e.preventDefault();
+            return false;
+        }
+    });
+    // Redirect on success
+    (function() {
+        var messageElement = document.getElementById('csifMsg');
+        if (messageElement && messageElement.classList.contains('success')) {
+            setTimeout(function() {
+                window.location.href = "/";
+            }, 2000);
+        }
+    })();
+    </script>
+</body>
+</html>

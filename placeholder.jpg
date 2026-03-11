@@ -1,0 +1,338 @@
+print(">>> RUNNING THIS APP.PY <<<")
+print("🔥🔥🔥 THIS APP.PY IS RUNNING 🔥🔥🔥")
+
+from flask import Flask, render_template, request, redirect, session
+import sqlite3
+from datetime import datetime
+import qrcode
+from io import BytesIO
+import base64
+
+app = Flask(__name__)
+app.secret_key = "nrsc_secret_key"
+
+VISITOR_DB = "visitors.db"
+STAFF_DB = "nrsc.db"
+
+# ---------------- DB CONNECTION HELPERS ----------------
+def get_visitor_db():
+    conn = sqlite3.connect(VISITOR_DB)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def get_staff_db():
+    conn = sqlite3.connect(STAFF_DB)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+# ============== QR CODE HELPER FUNCTION ============== 
+def generate_qr_code(visitor_id, visitor_name, visit_date, visit_duration):
+    """Generate QR code for visitor approval"""
+    # Create QR code data with visitor information
+    qr_data = f"Visitor ID: {visitor_id}\nName: {visitor_name}\nDate: {visit_date}\nDuration: {visit_duration}"
+    
+    # Generate QR code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(qr_data)
+    qr.make(fit=True)
+    
+    # Create image from QR code
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    # Convert image to base64 string for embedding in HTML
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    img_str = base64.b64encode(buffer.getvalue()).decode()
+    
+    return f"data:image/png;base64,{img_str}"
+
+# ---------------- INIT VISITOR DB ----------------
+def init_visitor_db():
+    conn = sqlite3.connect(VISITOR_DB)
+    cur = conn.cursor()
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS visitors (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        email TEXT,
+        phone TEXT,
+        organization TEXT,
+        profession TEXT,
+        address TEXT,
+        visit_date TEXT,
+        visit_duration TEXT,
+        purpose TEXT,
+        person TEXT,
+        staff_email TEXT,
+        staff_phone TEXT,
+        group_count INTEGER DEFAULT 1,
+        date TEXT,
+        time TEXT,
+        status TEXT DEFAULT 'Pending',
+        qr_code TEXT
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+init_visitor_db()
+
+# ---------------- HOME ----------------
+@app.route("/")
+def home():
+    return render_template("home.html")
+
+# ---------------- VISITOR OPTIONS ----------------
+@app.route("/visitor/options")
+def visitor_options():
+    return render_template("visitor_options.html")
+
+# ---------------- VISITOR REGISTRATION ----------------
+@app.route("/visitor", methods=["GET", "POST"])
+def visitor():
+    session.pop("visitor_id",None)
+    if request.method == "POST":
+        now = datetime.now()
+        conn = get_visitor_db()
+        cur = conn.cursor()
+
+        cur.execute("""
+            INSERT INTO visitors (
+                name, email, phone, organization, profession, address,
+                visit_date, visit_duration, purpose, person,
+                staff_email, staff_phone, group_count, date, time, status
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')
+        """, (
+            request.form["name"],
+            request.form["email"],
+            request.form["phone"],
+            request.form.get("organization"),
+            request.form.get("profession"),
+            request.form.get("address"),
+            request.form["visit_date"],
+            request.form["visit_duration"],
+            request.form["purpose"],
+            request.form["person"],
+            request.form.get("staff_email"),
+            request.form.get("staff_phone"),
+            request.form.get("group_count", 1),
+            now.strftime("%d-%m-%Y"),
+            now.strftime("%H:%M:%S")
+        ))
+
+        visitor_id = cur.lastrowid   # ✅ STORE VISITOR ID
+        conn.commit()
+        conn.close()
+
+        session["visitor_id"] = visitor_id  # ✅ SESSION FIX
+
+        return redirect("/visitor/status")
+
+    return render_template("visitor.html")
+
+# ============== VISITOR STATUS (FIXED) ============== 
+@app.route("/visitor/status")
+def visitor_my_status():
+    visitor_id = session.get("visitor_id")
+
+    if not visitor_id:
+        return redirect("/visitor")
+
+    conn = get_visitor_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, name, phone, person, purpose, status, visit_date, visit_duration, qr_code
+        FROM visitors
+        WHERE id = ?
+    """, (visitor_id,))
+
+    visitor = cur.fetchone()
+    conn.close()
+
+    return render_template("visitor_status.html", visitor=visitor)
+
+
+# ---------------- SUCCESS ----------------
+@app.route("/success")
+def success():
+    return render_template("success.html")
+
+# ---------------- STAFF LOGIN ----------------
+@app.route("/staff", methods=["GET", "POST"])
+def staff_login():
+    if request.method == "POST":
+        conn = get_staff_db()
+        cur = conn.cursor()
+
+        cur.execute(
+            "SELECT name, role FROM staff WHERE staff_id=? AND password=?",
+            (request.form["staff_id"], request.form["password"])
+        )
+        staff = cur.fetchone()
+        conn.close()
+
+        if staff:
+            session["staff_id"] = request.form["staff_id"]
+            session["name"] = staff["name"]
+            session["role"] = staff["role"]
+            return redirect("/staff/visitors")
+
+        return render_template("staff_login.html", error="Invalid credentials")
+
+    return render_template("staff_login.html")
+
+# ---------------- STAFF VISITORS ----------------
+@app.route("/staff/visitors")
+def staff_visitors():
+    if "staff_id" not in session:
+        return redirect("/staff")
+
+    conn = get_visitor_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM visitors ORDER BY id DESC")
+    visitors = cur.fetchall()
+    conn.close()
+
+    return render_template("staff_visitors.html", visitors=visitors)
+
+# ============== APPROVE VISITOR ============== 
+@app.route("/staff/approve/<int:visitor_id>", methods=["POST"])
+def approve_visitor(visitor_id):
+    conn = get_visitor_db()
+    cur = conn.cursor()
+    
+    # Get visitor details
+    cur.execute(
+        "SELECT name, visit_date, visit_duration FROM visitors WHERE id=?",
+        (visitor_id,)
+    )
+    visitor = cur.fetchone()
+    
+    if visitor:
+        # Generate QR code
+        qr_code_data = generate_qr_code(
+            visitor_id, 
+            visitor["name"], 
+            visitor["visit_date"], 
+            visitor["visit_duration"]
+        )
+        
+        # Update visitor status and QR code
+        cur.execute(
+            "UPDATE visitors SET status='Approved', qr_code=? WHERE id=?",
+            (qr_code_data, visitor_id)
+        )
+    else:
+        cur.execute(
+            "UPDATE visitors SET status='Approved' WHERE id=?",
+            (visitor_id,)
+        )
+    
+    conn.commit()
+    conn.close()
+    return redirect("/staff/visitors")
+
+# ---------------- REJECT VISITOR ----------------
+@app.route("/staff/reject/<int:visitor_id>", methods=["POST"])
+def reject_visitor(visitor_id):
+    conn = get_visitor_db()
+    cur = conn.cursor()
+    cur.execute("UPDATE visitors SET status='Rejected' WHERE id=?", (visitor_id,))
+    conn.commit()
+    conn.close()
+    return redirect("/staff/visitors")
+
+# ---------------- LOGOUT ----------------
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+# ---------------- ADMIN LOGIN ----------------
+@app.route("/admin_login", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        conn = sqlite3.connect(STAFF_DB)
+        cur = conn.cursor()
+
+        cur.execute(
+            "SELECT id, username FROM admin WHERE username=? AND password=?",
+            (request.form["username"], request.form["password"])
+        )
+        admin = cur.fetchone()
+        conn.close()
+
+        if admin:
+            session["admin_logged_in"] = True
+            session["admin_id"] = admin[0]
+            session["admin_name"] = admin[1]
+            session["login_time"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+            return redirect("/admin_dashboard")
+
+        return render_template("admin_login.html", error="Invalid Admin Credentials")
+
+    return render_template("admin_login.html")
+
+# ---------------- ADMIN DASHBOARD ----------------
+@app.route("/admin_dashboard")
+def admin_dashboard():
+    if "admin_logged_in" not in session:
+        return redirect("/admin_login")
+
+    return render_template(
+        "admin_dashboard.html",
+        admin_name=session["admin_name"],
+        admin_id=session["admin_id"],
+        login_time=session["login_time"]
+    )
+
+# ---------------- ADMIN VISITORS ----------------
+@app.route("/admin/visitors")
+def admin_visitors():
+    if "admin_logged_in" not in session:
+        return redirect("/admin_login")
+
+    conn = sqlite3.connect(VISITOR_DB)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM visitors ORDER BY id DESC")
+    visitors = cur.fetchall()
+    conn.close()
+
+    return render_template("admin_visitors.html", visitors=visitors)
+
+# ---------------- ADMIN STAFF ----------------
+@app.route("/admin/staff")
+def admin_staff():
+    if "admin_logged_in" not in session:
+        return redirect("/admin_login")
+
+    conn = sqlite3.connect(STAFF_DB)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM staff ORDER BY staff_id")
+    staff = cur.fetchall()
+    conn.close()
+
+    return render_template("admin_staff.html", staff=staff)
+@app.route("/debug/routes")
+def debug_routes():
+    return "<br>".join([str(r) for r in app.url_map.iter_rules()])
+# 🔴 TEMPORARY TEST ROUTE (ADD THIS EXACTLY)
+@app.route("/visitor/status")
+def visitor_status_test():
+    return "VISITOR STATUS ROUTE IS WORKING"
+
+# ---------------- RUN ----------------
+if __name__ == "__main__":
+    print(">>> THIS APP.PY IS RUNNING <<<")
+    app.run(debug=True)

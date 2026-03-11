@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aadhaar Verification</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .box {
+            background: white;
+            padding: 30px;
+            width: 350px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 16px;
+        }
+        button {
+            background: #0056b3;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #003d80;
+        }
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+<div class="box">
+    <h2>Aadhaar Verification</h2>
+
+    <!-- NO FORM TAG (important) -->
+    <input type="text" id="aadhaar" placeholder="Aadhaar Number">
+    <input type="date" id="dob">
+
+    <!-- Explicit button -->
+    <button type="button" onclick="verifyAadhaar()">Verify</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+function verifyAadhaar() {
+    const aadhaar = document.getElementById("aadhaar").value.trim();
+    const dob = document.getElementById("dob").value;
+
+    if (!aadhaar || !dob) {
+        alert("Please enter Aadhaar and DOB");
+        return;
+    }
+
+    fetch("/verify_aadhaar", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            aadhaar: aadhaar,
+            dob: dob
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        const result = document.getElementById("result");
+
+        if (data.status === "verified") {
+            result.style.color = "green";
+            result.innerHTML = "✅ VERIFIED<br>Welcome " + data.name;
+
+            // redirect after success
+            setTimeout(() => {
+                window.location.href = "/visitor";
+            }, 1500);
+        } else {
+            result.style.color = "red";
+            result.innerHTML = "❌ " + data.reason;
+        }
+    })
+    .catch(err => {
+        alert("Server error. Check console.");
+        console.error(err);
+    });
+}
+</script>
+</body>
+</html>

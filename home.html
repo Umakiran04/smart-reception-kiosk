@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login | NRSC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="auth-body">
+
+    <!-- CENTER WRAPPER ADDED -->
+    <div class="center-wrapper">
+
+        <div class="auth-container">
+            <h2>Admin Login</h2>
+            <p class="subtitle">Administrator access only</p>
+
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% endif %}
+
+            <form method="POST" action="/admin_login">
+                <input type="text" name="username" placeholder="Admin Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+
+                <button type="submit" class="btn-primary">
+                    Login
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+</body>
+</html>
+
+
+
+
+

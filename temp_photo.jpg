@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Visitor Registration | NRSC</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                linear-gradient(
+                    rgba(255, 255, 255, 0.88),
+                    rgba(255, 255, 255, 0.88)
+                ),
+                url("{{ url_for('static', filename='image/pslv_bg.jpg') }}");
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            background: #eaf6ff;
+            width: 460px;
+            padding: 35px 30px;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        h1 { color: #0b4db8; }
+        p { font-size: 14px; color: #555; }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        input, textarea, select {
+            padding: 12px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #bbb;
+        }
+
+        .section-label {
+            text-align: left;
+            font-weight: bold;
+            color: #0b4db8;
+            margin-top: 8px;
+        }
+
+        .submit-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #f57c00;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Visitor Registration</h1>
+    <p>Please fill your details to continue</p>
+
+    <form method="POST" action="{{ url_for('visitor') }}">
+
+        <!-- Visitor Details -->
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="Email Address" required>
+        <input type="text" name="phone" placeholder="Mobile Number" required>
+        <input type="text" name="organization" placeholder="Organization">
+        <input type="text" name="profession" placeholder="Profession">
+        <textarea name="address" placeholder="Residential Address"></textarea>
+
+        <!-- Visit Details -->
+        <div class="section-label">Visit Details</div>
+        <input type="date" name="visit_date" required>
+
+        <select name="visit_duration" required>
+            <option value="">Select Visit Duration</option>
+            <option>30 Minutes</option>
+            <option>1 Hour</option>
+            <option>2 Hours</option>
+            <option>Half Day</option>
+            <option>Full Day</option>
+        </select>
+
+        <input type="text" name="purpose" placeholder="Purpose of Visit" required>
+
+        <!-- Visit Type -->
+        <div class="section-label">Visit Type</div>
+        <select name="visit_type" id="visit_type" required onchange="toggleGroupInput()">
+            <option value="">visit type</option>
+            <option value="individual">individual</option>
+            <option value="group">group</option>
+        </select>
+
+        <div id="group_size_div" style="display:none;">
+            <input type="number" name="group_size" id="group_size" min="1"
+                   placeholder="Number of individuals">
+        </div>
+
+        <!-- Valid Document -->
+        <div class="section-label">Valid Document</div>
+        <select name="docType" id="docType" required onchange="handleDocChange()">
+            <option value="">document type</option>
+            <option value="Aadhar card">Aadhar card</option>
+            <option value="Pancard">Pancard</option>
+            <option value="driving License">driving License</option>
+        </select>
+
+        <div id="panField" style="display:none;">
+            <input type="text" name="panNumber" placeholder="Enter PAN Number" maxlength="10">
+        </div>
+
+        <div id="aadhaarField" style="display:none;">
+            <input type="text" name="aadhaarNumber" placeholder="Enter Aadhaar Number" maxlength="12">
+        </div>
+
+        <div id="drivingLicenseField" style="display:none;">
+            <input type="text" name="drivingLicenseNumber"
+                   placeholder="Enter Driving License Number" maxlength="15">
+        </div>
+
+        <!-- Photo Capture (FIXED) -->
+        <div class="section-label">Photo Capture</div>
+
+        <video id="video" width="300" height="225" autoplay></video>
+        <button type="button" onclick="capturePhoto()">📷 Capture Photo</button>
+
+        <canvas id="canvas" width="300" height="225" style="display:none;"></canvas>
+
+        <img id="photoPreview"
+             style="display:none; width:300px; border:1px solid black;">
+
+        <p id="captureStatus" style="color:red;">❌ Not Captured</p>
+
+        <input type="hidden" name="photo" id="photoInput">
+
+        <!-- Staff -->
+        <div class="section-label">Staff to Visit</div>
+        <select name="person" required>
+            <option value="">-- Select Staff --</option>
+            {% for staff in staff_list %}
+                <option value="{{ staff[0] }}">
+                    {{ staff[1] }} (ID: {{ staff[0] }})
+                </option>
+            {% endfor %}
+        </select>
+
+        <input type="email" name="staff_email" placeholder="Staff Email (optional)">
+        <input type="text" name="staff_phone" placeholder="Staff Phone Number (optional)">
+
+        <button type="submit" class="submit-btn">Submit</button>
+    </form>
+
+</div>
+
+<script>
+function toggleGroupInput() {
+    const visitType = document.getElementById("visit_type").value;
+    document.getElementById("group_size_div").style.display =
+        visitType === "group" ? "block" : "none";
+}
+
+function handleDocChange() {
+    const docType = document.getElementById("docType").value;
+
+    document.getElementById("panField").style.display = "none";
+    document.getElementById("aadhaarField").style.display = "none";
+    document.getElementById("drivingLicenseField").style.display = "none";
+
+    if (docType === "Pancard")
+        document.getElementById("panField").style.display = "block";
+    else if (docType === "Aadhar card")
+        document.getElementById("aadhaarField").style.display = "block";
+    else if (docType === "driving License")
+        document.getElementById("drivingLicenseField").style.display = "block";
+}
+
+// Webcam
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const preview = document.getElementById("photoPreview");
+const photoInput = document.getElementById("photoInput");
+const statusText = document.getElementById("captureStatus");
+
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => video.srcObject = stream)
+.catch(() => alert("Camera not accessible"));
+
+function capturePhoto() {
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const imageData = canvas.toDataURL("image/png");
+    preview.src = imageData;
+    preview.style.display = "block";
+    photoInput.value = imageData;
+
+    statusText.innerHTML = "✅ Captured";
+    statusText.style.color = "green";
+}
+</script>
+
+</body>
+</html>

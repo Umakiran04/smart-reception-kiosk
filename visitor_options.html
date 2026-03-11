@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Staff Visitor Approval | NRSC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="auth-body">
+
+<div class="dashboard-container" style="width:95%; max-width:1400px;">
+
+    <!-- ================= STAFF PROFILE HEADER ================= -->
+    <div class="staff-header">
+
+        <div class="staff-profile">
+            <img
+  src="{{ url_for('static', filename='uploads/' ~ (staff.profile_image if staff.profile_image else 'user.png')) }}"
+  class="profile-img">
+  
+
+            <div class="staff-info">
+                <h3>{{ staff.name }}</h3>
+                <p>{{ staff.designation }}</p>
+                <p><strong>ID:</strong> {{ staff.staff_id }}</p>
+                <p>{{ staff.department }}</p>
+
+                <!-- Upload Photo -->
+                <form method="POST" action="/staff/upload-photo" enctype="multipart/form-data" class="upload-form">
+    <label class="upload-icon">
+        📷
+        <input type="file" name="photo" accept="image/*" onchange="this.form.submit()" hidden>
+    </label>
+</form>
+            </div>
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+
+    <!-- ================= PAGE TITLE ================= -->
+    <h2 style="margin-bottom:10px;">Visitor Approval Panel</h2>
+
+    <!-- ================= SEARCH ================= -->
+    <input
+        type="text"
+        id="searchInput"
+        placeholder="Search by name or phone..."
+        class="search-box"
+        onkeyup="filterTable()"
+        style="width:100%; padding:10px; margin-bottom:15px;"
+    />
+
+    <!-- ================= SCROLLABLE TABLE ================= -->
+    <div class="table-scroll">
+        <table class="fixed-table compact-table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Visit Date</th>
+            <th>Person to Meet</th>
+            <th>Purpose</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for v in visitors %}
+        <tr>
+            <td>{{ v.name }}</td>
+            <td>{{ v.phone }}</td>
+            <td>{{ v.email }}</td>
+            <td>{{ v.visit_date }}</td>
+            <td>{{ v.person }}</td>
+            <td>{{ v.purpose }}</td>
+
+            <td>
+                {% if v.status == 'Approved' %}
+                    <span class="status approved">Approved</span>
+                {% elif v.status == 'Rejected' %}
+                    <span class="status rejected">Rejected</span>
+                {% else %}
+                    <span class="status pending">Pending</span>
+                {% endif %}
+            </td>
+
+            <td>
+                <button class="btn-view" onclick="openModal({{ v.id }})">
+    View Details
+</button>
+                    {% if v.status == 'Pending' %}
+                        <form method="POST" action="/staff/approve/{{ v.id }}" style="display:inline;">
+                            <button class="btn-approve">Approve</button>
+                        </form>
+                        <form method="POST" action="/staff/reject/{{ v.id }}" style="display:inline;">
+                            <button class="btn-reject">Reject</button>
+                        </form>
+                    {% elif v.status == 'Approved' %}
+                        <span class="status approved">✔ Approved</span>
+                        <br>
+                        <a href="/gate_pass/{{ v.id }}" target="_blank" class="btn-gate-pass">View Gate Pass</a>
+                    {% else %}
+                        <span class="status rejected">⛔ Rejected</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+<!-- MODAL -->
+<!-- POPUP MODAL -->
+<div id="visitorModal" class="modal-overlay">
+  <div class="modal-vertical">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h3>Visitor Details</h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ✅ ONLY ADDITION (JSON SAFE BLOCK) -->
+ <script>
+const visitorsData = {{ visitors | tojson | safe }};
+
+function openModal(visitorId) {
+    const visitor = visitorsData.find(v => Number(v.id) === Number(visitorId));
+
+    if (!visitor) {
+        alert("Visitor not found!");
+        return;
+    }
+
+    const modalBody = document.getElementById("modalBody");
+
+    modalBody.innerHTML = `
+        <p><strong>Name:</strong> ${visitor.name || ''}</p>
+        <p><strong>Phone:</strong> ${visitor.phone || ''}</p>
+        <p><strong>Email:</strong> ${visitor.email || ''}</p>
+        <p><strong>Organization:</strong> ${visitor.organization || ''}</p>
+        <p><strong>Profession:</strong> ${visitor.profession || ''}</p>
+        <p><strong>Address:</strong> ${visitor.address || ''}</p>
+        <p><strong>Visit Date:</strong> ${visitor.visit_date || ''}</p>
+        <p><strong>Visit Duration:</strong> ${visitor.visit_duration || ''}</p>
+        <p><strong>Purpose:</strong> ${visitor.purpose || ''}</p>
+        <p><strong>Person to Meet:</strong> ${visitor.person || ''}</p>
+        <p><strong>Status:</strong> ${visitor.status || ''}</p>
+    `;
+
+    document.getElementById("visitorModal").style.display = "block";
+}
+
+function closeModal() {
+    document.getElementById("visitorModal").style.display = "none";
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById("visitorModal");
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
+
+</body>
+</html>
+
+

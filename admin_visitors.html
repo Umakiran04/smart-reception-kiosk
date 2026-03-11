@@ -1,0 +1,686 @@
+/* ===================== GLOBAL ===================== */
+.auth-body,
+.light-body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        linear-gradient(
+            rgba(255, 255, 255, 0.92),
+            rgba(255, 255, 255, 0.92)
+        ),
+        url("/static/image/pslv_bg.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* ===================== COMMON CARDS ===================== */
+.card,
+.login-box,
+.auth-container,
+.dashboard-container,
+.option-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 35px;
+    border-radius: 22px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    backdrop-filter: blur(6px);
+}
+
+/* Width control */
+.card {
+    width: 420px;
+}
+
+.login-box,
+.auth-container,
+.option-container {
+    width: 380px;
+}
+
+.dashboard-container {
+    width: 90%;
+    max-width: 1100px;
+}
+
+/* ===================== LOGO ===================== */
+.logo {
+    width: 120px;
+    margin-bottom: 15px;
+}
+
+.logo-bordered {
+    width: 120px;
+    padding: 8px;
+    border: 3px solid #0b4db8;
+    border-radius: 12px;
+    background: white;
+}
+
+/* ===================== TEXT ===================== */
+h1, h2 {
+    color: #0b4db8;
+}
+
+p {
+    color: #444;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* ===================== INPUT ===================== */
+input,
+.search-box {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #bbb;
+    font-size: 14px;
+    outline: none;
+}
+
+input:focus,
+.search-box:focus {
+    border-color: #0b4db8;
+}
+
+/* ===================== BUTTONS ===================== */
+.btn,
+.btn-orange,
+.btn-primary,
+.btn-pass,
+.btn-approve {
+    display: inline-block;
+    padding: 10px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    background: #ff9800;
+    color: white;
+}
+
+.btn:hover,
+.btn-orange:hover,
+.btn-primary:hover,
+.btn-pass:hover,
+.btn-approve:hover {
+    background: #f57c00;
+    transform: scale(1.03);
+}
+
+.btn-blue {
+    background: #0b4db8;
+    color: white;
+}
+
+.btn-blue:hover {
+    background: #083b8a;
+}
+
+.btn-reject {
+    background: #e53935;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-reject:hover {
+    background: #c62828;
+}
+
+.disabled,
+.btn-disabled {
+    background: #dcdcdc;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* Full width buttons */
+.full-width {
+    width: 100%;
+}
+/* Dark Background */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+}
+
+/* Vertical Rectangle Box */
+.modal-vertical {
+    background: #ffffff;
+    width: 400px;              /* narrow width */
+    height: 80vh;              /* tall vertical */
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 12px;
+    overflow-y: auto;          /* scroll if long */
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* Close Button */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: red;
+}
+
+/* Content Styling */
+.modal-content-area p {
+    margin: 8px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+/* ===================== HOME ===================== */
+.home-card {
+    display: flex;
+    align-items: center;
+    gap: 35px;
+    padding: 45px 50px;
+    max-width: 650px;
+}
+
+.home-content {
+    text-align: left;
+}
+
+.home-buttons,
+.option-buttons,
+.dashboard-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 25px;
+}
+
+/* ===================== TABLE ===================== */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.fixed-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin-top: 25px;
+}
+
+.fixed-table th,
+.fixed-table td {
+    border: 1px solid #cfd8dc;
+    padding: 14px;
+    text-align: center;
+    vertical-align: middle;
+    word-wrap: break-word;
+}
+
+.fixed-table th {
+    background: #ff9800;
+    color: white;
+    font-size: 15px;
+}
+
+.fixed-table th:last-child,
+.fixed-table td:last-child {
+    width: 180px;
+    white-space: nowrap;
+}
+
+/* ===================== STATUS ===================== */
+.status {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.status.approved { color: green; }
+.status.pending  { color: orange; }
+.status.rejected { color: red; }
+
+/* ===================== ACTION CELL ===================== */
+.action-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+/* ===================== LINKS ===================== */
+.link-box {
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    margin: 18px 0;
+}
+
+.link-box input {
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+/* ===================== MISC ===================== */
+.error {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.logout {
+    margin-top: 20px;
+    color: #0b4db8;
+}
+.staff-page {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.staff-sidebar {
+    width: 25%;
+    background: #f4f8ff;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.profile-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 2px solid #0b4db8;
+    margin-bottom: 15px;
+}
+
+.profile-details p {
+    margin: 6px 0;
+    text-align: left;
+}
+
+.btn-red {
+    display: block;
+    margin-top: 20px;
+    background: #d32f2f;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn-red:hover {
+    background: #b71c1c;
+}
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 10px;
+    background: #e8f0ff;
+    border-radius: 8px;
+}
+
+.profile-content {
+    display: none;
+    margin-top: 15px;
+}
+/* FLOATING PROFILE PANEL */
+.staff-profile-float {
+    position: fixed;
+    top: 90px;
+    right: 25px;
+    width: 230px;
+    z-index: 1000;
+    font-family: inherit;
+}
+
+/* Header */
+.profile-header {
+    background: #e8f0ff;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+/* Hidden content */
+.profile-content {
+    display: none;
+    background: #ffffff;
+    margin-top: 8px;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+/* Image */
+.profile-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid #0b4db8;
+    margin-bottom: 10px;
+}
+
+/* Logout */
+.btn-red {
+    display: block;
+    margin-top: 12px;
+    background: #d32f2f;
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+}
+/* ===== FIX STAFF VISITORS TABLE ===== */
+
+.fixed-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;        /* 🔑 allow natural column width */
+    white-space: nowrap;       /* 🔑 prevent text breaking */
+}
+
+.fixed-table th,
+.fixed-table td {
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;       /* 🔑 stop vertical text */
+    font-size: 14px;
+}
+
+/* Header */
+.fixed-table thead th {
+    background: #ff9800;
+    color: white;
+    font-weight: bold;
+}
+
+/* Wrap table in horizontal scroll */
+.dashboard-container {
+    overflow-x: auto;          /* 🔑 horizontal scroll */
+}
+
+/* Improve row spacing */
+.fixed-table tbody tr {
+    border-bottom: 1px solid #ddd;
+}
+
+/* Status colors remain intact */
+.status.approved {
+    color: green;
+    font-weight: bold;
+}
+
+.status.rejected {
+    color: red;
+    font-weight: bold;
+}
+
+.status.pending {
+    color: orange;
+    font-weight: bold;
+}
+
+/* Action buttons spacing */
+.btn-approve,
+.btn-reject {
+    padding: 6px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+/* ===== CLEAN COMPACT TABLE (NO SCROLL) ===== */
+
+.compact-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;   /* 🔑 key for neat layout */
+    font-size: 13px;
+}
+
+/* Header + cell base */
+.compact-table th,
+.compact-table td {
+    padding: 8px 6px;
+    text-align: center;
+    vertical-align: middle;
+    word-wrap: break-word;
+    white-space: normal;   /* 🔑 allow wrapping */
+}
+
+/* Header styling */
+.compact-table thead th {
+    background: #ff9800;
+    color: white;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* Name & Email slightly left aligned */
+.compact-table td:nth-child(1),
+.compact-table td:nth-child(3) {
+    text-align: left;
+}
+
+/* Reduce clutter for long text columns */
+.compact-table td:nth-child(4),
+.compact-table td:nth-child(5),
+.compact-table td:nth-child(10) {
+    font-size: 12px;
+}
+
+/* Status column clean */
+.compact-table td:nth-child(12) {
+    font-weight: bold;
+}
+
+/* Action buttons compact */
+.compact-table .btn-approve,
+.compact-table .btn-reject {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+/* Remove horizontal scroll completely */
+.dashboard-container {
+    overflow-x: hidden;
+}
+.search-box {
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+/* ===== TOP RIGHT PROFILE (GOOGLE STYLE) ===== */
+
+.top-profile {
+    position: fixed;
+    top: 15px;
+    right: 25px;
+    z-index: 2000;
+}
+
+.profile-icon img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #0b4db8;
+}
+
+/* Dropdown */
+.profile-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    margin-top: 10px;
+    background: white;
+    width: 220px;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    text-align: left;
+}
+
+.profile-menu p {
+    margin: 6px 0;
+    font-size: 14px;
+}
+
+.profile-menu a {
+    display: block;
+    margin-top: 10px;
+    color: red;
+    font-weight: bold;
+    text-decoration: none;
+}
+/* Aadhaar Verification Page */
+
+/* ===== FORCE AADHAAR PAGE LAYOUT ===== */
+
+#aadhaar-page {
+    margin: 0;
+    padding: 0;
+}
+
+/* Override all inherited flex/grid */
+#aadhaar-wrapper {
+    position: fixed;
+    inset: 0;
+    background: #f4f6f8;
+
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* Aadhaar card */
+#aadhaar-card {
+    all: unset; /* resets inherited CSS safely */
+    display: block;
+
+    width: 400px;
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+    text-align: center;
+
+    font-family: Arial, sans-serif;
+}
+
+/* Heading */
+#aadhaar-card h2 {
+    margin-bottom: 22px;
+    font-size: 26px;
+    color: #0b5ed7;
+}
+
+/* Inputs */
+#aadhaar-card {
+    display: block;
+    width: 400px;
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+/* Aadhaar card refinement */
+.card {
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* Button styles for Aadhaar card submit button are defined below */
+
+#aadhaar-card input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+
+#aadhaar-card button:hover {
+    background: #084298;
+}
+/* ===== Aadhaar Page Refinements ===== */
+
+.light-body .card input {
+    margin-top: 12px;
+}
+
+.light-body .card button {
+    margin-top: 18px;
+    font-size: 15px;
+}
+/* Aadhaar submit button feedback */
+.btn-blue {
+    transition: all 0.2s ease;
+}
+
+.btn-blue:active {
+    transform: scale(0.97);
+}
+
+.btn-blue.loading {
+    background: #9bb7e0;
+    cursor: wait;
+}
+
+
+/* Result */
+#aadhaar-card #result {
+    margin-top: 16px;
+    font-weight: bold;
+}

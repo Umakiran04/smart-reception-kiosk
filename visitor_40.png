@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Webcam Capture</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <style>
+        #video, #canvas {
+            border: 1px solid #333;
+            border-radius: 6px;
+            background: black;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2>Capture Visitor Photo</h2>
+
+    <video
+        id="video"
+        width="320"
+        height="240"
+        autoplay
+        muted
+        playsinline
+    ></video>
+
+    <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+
+    <br><br>
+    <button id="captureBtn" class="btn">Capture</button>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const captureBtn = document.getElementById("captureBtn");
+
+    // Start webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+            video.play(); // 🔥 IMPORTANT
+            console.log("Camera started");
+        })
+        .catch(err => {
+            alert("Camera access denied. Please allow camera access.");
+            console.error(err);
+        });
+
+    // Capture photo
+    captureBtn.addEventListener("click", () => {
+        console.log("Capture clicked");
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = canvas.toDataURL("image/jpeg");
+
+        fetch("/save_photo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: imageData })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("Saved:", data);
+            window.location.href = "/visitor"; // ✅ correct route
+        })
+        .catch(err => {
+            alert("Photo upload failed");
+            console.error(err);
+        });
+    });
+
+});
+</script>
+
+</body>
+</html>

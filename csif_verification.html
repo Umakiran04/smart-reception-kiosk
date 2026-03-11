@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+    body { background: red !important; }
+</style>
+
+    <title>Aadhaar Verification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body id="aadhaar-page">
+
+<div id="aadhaar-wrapper">
+    <div id="aadhaar-card">
+        <h2>Aadhaar Verification</h2>
+
+        <input type="text" id="aadhaar" placeholder="Enter 12-digit Aadhaar">
+        <input type="date" id="dob">
+
+        <button type="button" onclick="verifyAadhaar()">Verify & Continue</button>
+
+        <div id="result"></div>
+    </div>
+</div>
+
+<script>
+function verifyAadhaar() {
+    const aadhaar = document.getElementById("aadhaar").value.trim();
+    const dob = document.getElementById("dob").value;
+
+    if (!aadhaar || !dob) {
+        alert("Please enter Aadhaar and DOB");
+        return;
+    }
+
+    fetch("/verify_aadhaar", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ aadhaar, dob })
+    })
+    .then(res => res.json())
+    .then(data => {
+        const result = document.getElementById("result");
+        if (data.status === "verified") {
+            result.style.color = "green";
+            result.innerHTML = "✅ VERIFIED<br>Welcome " + data.name;
+            setTimeout(() => window.location.href = "/visitor", 1500);
+        } else {
+            result.style.color = "red";
+            result.innerHTML = "❌ " + data.reason;
+        }
+    });
+}
+</script>
+
+</body>
+</html>

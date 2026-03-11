@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Dashboard | NRSC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="auth-body">
+
+<!-- CENTER WRAPPER -->
+<div class="center-wrapper">
+
+    <div class="dashboard-container">
+
+        <!-- Header -->
+        <div class="dashboard-header">
+            <h2>Welcome, {{ name }}</h2>
+            <p class="subtitle">Role: {{ role }}</p>
+        </div>
+
+        <!-- Generated Link Box -->
+        {% if link %}
+        <div class="link-box">
+            <h3>Temporary Visitor Registration Link</h3>
+
+            <input
+                type="text"
+                value="{{ link }}"
+                readonly
+                onclick="this.select()"
+                class="link-input"
+            >
+
+            <div class="link-actions">
+                <a href="{{ link }}" target="_blank" class="btn-orange">
+                    Open Registration Page
+                </a>
+            </div>
+
+            <p class="hint">
+                ⏳ This link is valid for limited time and limited entries only.
+            </p>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="dashboard-actions">
+
+            {% if not link %}
+            <form method="POST" action="/staff/create_link">
+                <button type="submit" class="btn-orange full-width">
+                    Generate Visitor Link
+                </button>
+            </form>
+
+            <a href="/staff/visitors" class="btn-orange full-width">
+                View Visitor List
+            </a>
+            {% endif %}
+
+            <a href="/logout" class="btn-blue full-width">
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Visitors</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="auth-body">
+
+<div class="dashboard-container">
+    <h2>All Visitors</h2>
+
+    <table class="fixed-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Person</th>
+                <th>Status</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for v in visitors %}
+            <tr>
+                <td>{{ v.id }}</td>
+                <td>{{ v.name }}</td>
+                <td>{{ v.person }}</td>
+
+                <td class="status {{ v.status|lower }}">
+                    {{ v.status }}
+                </td>
+
+                <td>
+                    {% if v.status == 'Approved' %}
+                        <a href="/admin/view_pdf/{{ v.id }}" target="_blank">
+                            View PDF
+                        </a>
+                    {% else %}
+                        <span style="color: gray;">Not Available</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+    <a href="/admin_dashboard" class="btn-blue">⬅ Back</a>
+</div>
+
+</body>
+</html>

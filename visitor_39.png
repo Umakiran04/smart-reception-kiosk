@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Visitor Approval Status</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .qr-section {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+
+        .approval-message {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .pending-message {
+            color: #ff9800;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .rejected-message {
+            color: #d32f2f;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .gatepass-btn {
+            padding: 10px 18px;
+            background-color: #0b5ed7;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body class="auth-body">
+
+<div class="dashboard-container">
+    <h2>Visitor Approval Status</h2>
+
+    {% if visitor %}
+    <table class="fixed-table">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Staff</th>
+            <th>Purpose</th>
+            <th>Status</th>
+            <th>Gate Pass</th>
+        </tr>
+
+        <tr>
+            <td>{{ visitor.id }}</td>
+            <td>{{ visitor.name }}</td>
+            <td>{{ visitor.phone }}</td>
+            <td>{{ visitor.person }}</td>
+            <td>{{ visitor.purpose }}</td>
+            <td class="status {{ visitor.status|lower }}">
+                {{ visitor.status }}
+            </td>
+
+            <!-- GATE PASS COLUMN -->
+            <td>
+                {% if visitor.status == 'Approved' %}
+                    <a href="{{ url_for('gate_pass', visitor_id=visitor.id) }}">
+                        <button class="gatepass-btn">Gate Pass</button>
+                    </a>
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <!-- STATUS MESSAGE BELOW -->
+    {% if visitor.status == 'Approved' %}
+        <div class="qr-section">
+            <div class="approval-message">
+                ✅ Your visit is approved. Click Gate Pass to view your pass.
+            </div>
+        </div>
+    {% elif visitor.status == 'Pending' %}
+        <div class="qr-section">
+            <div class="pending-message">⏳ Your request is pending approval</div>
+            <p>Please wait for the staff to approve your visit.</p>
+        </div>
+    {% elif visitor.status == 'Rejected' %}
+        <div class="qr-section">
+            <div class="rejected-message">❌ Your request has been rejected</div>
+            <p>Please contact the reception desk for more information.</p>
+        </div>
+    {% endif %}
+
+    {% else %}
+        <p>No visitor record found.</p>
+    {% endif %}
+
+    <br>
+    <a href="/visitor/options" class="btn-blue">⬅ Back</a>
+</div>
+
+</body>
+</html>

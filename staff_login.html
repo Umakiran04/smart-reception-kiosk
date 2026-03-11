@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gate Pass | NRSC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .gatepass-wrapper {
+            background: #fff;
+            padding: 30px;
+            border: 2px solid #000;
+            border-radius: 10px;
+        }
+
+        .gatepass-header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #0b5ed7;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .gatepass-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .left-section {
+            width: 65%;
+            display: flex;
+            gap: 25px;
+        }
+
+        .visitor-photo {
+            width: 150px;
+            height: 180px;
+            border: 2px solid #000;
+            object-fit: cover;
+        }
+
+        .visitor-info {
+            border-collapse: collapse;
+            font-size: 16px;
+        }
+
+        .visitor-info td {
+            padding: 6px 6px;
+            vertical-align: top;
+        }
+
+        .visitor-info .label {
+            width: 160px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .visitor-info .colon {
+            width: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .right-section {
+            width: 30%;
+            text-align: center;
+        }
+
+        .right-section img {
+            width: 170px;
+            height: 170px;
+            border: 2px solid #000;
+            padding: 6px;
+            background: #fff;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 70px;
+            text-align: center;
+        }
+
+        .sign-box {
+            width: 30%;
+        }
+
+        .sign-line {
+            border-top: 2px solid #000;
+            margin-bottom: 6px;
+            padding-top: 6px;
+            font-weight: bold;
+        }
+
+        .print-section {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .print-btn {
+            padding: 10px 25px;
+            font-size: 16px;
+            background-color: #0b5ed7;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        @media print {
+            .print-section {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="auth-body">
+
+<div class="dashboard-container">
+    <div class="gatepass-wrapper">
+
+        <!-- HEADER -->
+        <div class="gatepass-header">
+            NATIONAL REMOTE SENSING CENTRE (NRSC) – VISITOR GATE PASS
+        </div>
+
+        <!-- CONTENT -->
+        <div class="gatepass-content">
+
+            <!-- LEFT -->
+            <div class="left-section">
+
+                <!-- ✅ VISITOR PHOTO -->
+                {% if visitor.photo %}
+                    <img src="{{ url_for('uploaded_file', filename=visitor.photo.split('/')[-1]) }}"
+                         alt="Visitor Photo"
+                         class="visitor-photo">
+                {% else %}
+                    <img src="{{ url_for('static', filename='image/user.png') }}"
+                         alt="Visitor Photo"
+                         class="visitor-photo">
+                {% endif %}
+
+                <!-- DETAILS -->
+                <table class="visitor-info">
+                    <tr><td class="label">Name</td><td class="colon">:</td><td>{{ visitor.name }}</td></tr>
+                    <tr><td class="label">Organization</td><td class="colon">:</td><td>{{ visitor.organization }}</td></tr>
+                    <tr><td class="label">Purpose</td><td class="colon">:</td><td>{{ visitor.purpose }}</td></tr>
+                    <tr><td class="label">Duration</td><td class="colon">:</td><td>{{ visitor.visit_duration }}</td></tr>
+                    <tr><td class="label">Meeting With</td><td class="colon">:</td><td>{{ visitor.person }}</td></tr>
+                    <tr><td class="label">Date</td><td class="colon">:</td><td>{{ visitor.visit_date }}</td></tr>
+                    <tr><td class="label">Time</td><td class="colon">:</td><td>{{ visitor.time }}</td></tr>
+                </table>
+
+            </div>
+
+            <!-- RIGHT -->
+            <div class="right-section">
+                {% if visitor.qr_code %}
+                    <img src="{{ visitor.qr_code }}" alt="Visitor QR Code">
+                {% else %}
+                    <p>No QR Available</p>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- SIGNATURES -->
+        <div class="signature-section">
+            <div class="sign-box">
+                <div class="sign-line"></div>
+                Official Signature
+            </div>
+            <div class="sign-box">
+                <div class="sign-line"></div>
+                Signature of Your Guide
+            </div>
+            <div class="sign-box">
+                <div class="sign-line"></div>
+                Signature of Visitor
+            </div>
+        </div>
+
+        <!-- PRINT -->
+        <div class="print-section">
+            <button class="print-btn" onclick="window.print()">🖨️ Print Gate Pass</button>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

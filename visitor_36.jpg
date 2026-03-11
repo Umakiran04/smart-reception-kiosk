@@ -1,0 +1,25 @@
+<h2 style="text-align:center;">My Approval Status</h2>
+
+<table border="1" align="center" cellpadding="10">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Staff</th>
+        <th>Purpose</th>
+        <th>Status</th>
+    </tr>
+    <tr>
+        <td>{{ visitor.id }}</td>
+        <td>{{ visitor.name }}</td>
+        <td>{{ visitor.phone }}</td>
+        <td>{{ visitor.person }}</td>
+        <td>{{ visitor.purpose }}</td>
+        <td>{{ visitor.status }}</td>
+    </tr>
+</table>
+
+<br>
+<div style="text-align:center;">
+    <a href="/visitor/options">Back</a>
+</div>
